@@ -1,5 +1,8 @@
 module.exports = {
-    title: '学习vue3',
+    markdown: {
+        lineNumbers: true
+    },
+    title: 'vue3新特性',
     description: 'Just playing around',
     head: [
         ['link', {
@@ -12,19 +15,26 @@ module.exports = {
     themeConfig:{
         nav:[
             {text:'Home',link:'/'},
-            {text:'github',link:'/vuebased/'},
-            {text:'设置侧边栏文档',link:'https://blog.csdn.net/wq_ocean_/article/details/109220650'}
+            {text:'github',link:'https://github.com/zhenyulei/vue3-knowledge'},
+            {text:'codeDemo',link:'https://github.com/zhenyulei/vue3-demo'}
         ],
         sidebarDepth: 0,
         sidebar: {
-            '/vuebased/':[
+            '/pages/':[
                 {
-                    title:"基础配置",
+                    title:"新增特性",
                     children:[
                         '',
-                        ['newStatus','2.使用了新特性']
+                        'setup',
+                        'proxy',
+                        'asyncComponent',
+                        'cssinjs',
+                        'forKey',
+                        'slot',
+                        'model'
                     ]
-                }
+                },
+                'links'
             ]
         }
     },

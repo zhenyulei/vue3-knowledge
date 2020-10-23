@@ -1,7 +1,7 @@
-## 2.新特性 
-### 2.1、 新增setup方法
+## 2.setup 新特性 
 setup函数是一个新的组件选项。作为在组件内使用Composition API的入口点。
 
+[demo1](###)
 ```vue
 <template>
   <div>
@@ -19,27 +19,33 @@ export default {
 }
 </script>
 ```
-#### 2.1.1 执行时机
+### 1、执行时机
 
 创建组件实例，然后初始化props，紧接着就调用setup函数，从vue2的生命周期钩子的视角来看，它会在beforeCreate钩子之前被调用。
 
->注意：为了兼容vue2，vue3也可以在setup外面使用vue2的生命周期函数，但是不建议混合使用，vue3中可以按需将生命周期导入到组件中，且只能在 setup() 函数中使用
+:::tip
+注意：为了兼容vue2，vue3也可以在setup外面使用vue2的生命周期函数，但是不建议混合使用，vue3中可以按需将生命周期导入到组件中，且只能在 setup() 函数中使用
+:::
+|vue2|vue3|
+|--|--|
+|beforeCreate【删除】| 使用setup()|
+|created【删除】 | 使用 setup()|
+|beforeMount |onBeforeMount|
+|mounted | onMounted|
+|beforeUpdate | onBeforeUpdate|
+|updated | onUpdated|
+|beforeDestroy | onBeforeUnmount|
+|destroyed |onUnmounted|
 
-beforeCreate【删除】 -> 使用setup()
-created【删除】 ->  使用 setup()
-beforeMount -> onBeforeMount
-mounted -> onMounted
-beforeUpdate -> onBeforeUpdate
-updated -> onUpdated
-beforeDestroy -> onBeforeUnmount
-destroyed -> onUnmounted
+**新增调试钩子函数**
 
-**新的调试钩子函数**
 在Vue3中使用两个全新的钩子函数来进行调试。他们是：
 
 `onRenderTracked` 和 `onRenderTriggered`
 
 分别对应get()值，和set()变量，这两个事件都带有一个 DebuggerEvent，它使我们能够知道是什么导致了Vue实例中的重新渲染。
+
+使用方式：
 
 ```js
 export default {
@@ -49,11 +55,12 @@ export default {
   }
 }
 ```
-示例：
+[demo2](###)：
+关键点：<span style="color:red">生命周期+新增调试</span>
 ```vue
 <template>
     <div>
-        <p> {{ age }} --{{data.counter}}</p>
+        <p class="demo"> {{ age }} --{{data.counter}}</p>
     </div>
 </template>
 
@@ -82,10 +89,10 @@ export default {
         console.log('setup')
 
         onBeforeMount(() => {
-            console.log('onBeforeMount')
+            console.log(document.querySelector('.demo'),'onBeforeMount')
         })
         onMounted(() => {
-            console.log('onMounted')
+            console.log(document.querySelector('.demo'),'onMounted')
         })
         onBeforeUpdate(() => {
             console.log('onBeforeUpdate')
@@ -125,26 +132,29 @@ export default {
 ```
 
 #### 2.1.2 setup函数接收参数
-setup函数接收props作为其第一个参数，ctx上下文对象第二个参数
-1）props对象是响应式的，watchEffect或 watch 会观察和响应props的更新。不要对props对象进行解构，那样会失去响应性。
-2）ctx上下文包括了三个属性： attrs、slots、emit；
-示例1:
+setup函数接收两个参数：
+
+- 1）props作为其第一个参数：props对象是响应式的，watchEffect或 watch 会观察和响应props的更新。
+**不要对props对象进行解构，那样会失去响应性。**
+
+- 2）ctx上下文对象第二个参数：ctx上下文包括了三个属性： attrs、slots、emit；
+
+[demo3](###)
+
 父组件：
 ```vue
 <template>
   <div>
-      <img alt="Vue logo" src="./assets/logo.png" />
-      <HelloWorld :msg="parentMsg"></HelloWorld>
+      <Child3 :msg="parentMsg"></Child3>
       <button @click="myClick">点击我</button>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import Child3 from './children/child3.vue'
 export default {
-  name: 'App',
   components: {
-    HelloWorld
+    Child3
   },
   data(){
     return{
@@ -176,15 +186,16 @@ export default {
   },
   setup(props, ctx) {
     const {msg} = props;
+    //解构取值后，失去响应性
     watch(()=>msg, (val,oldVal)=>{
-      console.log(`msg change from ${oldVal} to ${val}`);
+      console.log(`watch：解构取值后，失去响应性，oldval =  ${oldVal} ，val = ${val}`);
     })
     watch(()=>props.msg, (val,oldVal)=>{
-      console.log(`props.msg change from ${oldVal} to ${val}`);
+      console.log(`watch：具有响应性，oldVal= ${oldVal} ，val= ${val}`);
     })
     watchEffect(() => {
-      console.log(`change--msg is: ` + props.msg) // Will not be reactive!
-      console.log(`msg is: ` + msg) // Will not be reactive!
+      console.log(`watchEffect：具有响应性 props.ms: ` + props.msg) // Will not be reactive!
+      console.log(`watchEffect：失去响应性 msg is: ` + msg) // Will not be reactive!
     })
   }
 }
@@ -192,12 +203,15 @@ export default {
 ```
 
 **补充：watch和watchEffect的区别**
-1）watchEffect 不需要指定监听的属性，他会自动的收集依赖，只要我们回调中引用到了"响应式的属性"， 那么当这些属性变更的时候，这个回调都会执行，而 watch 只能监听指定的属性而做出变更。
-2）watch 可以获取到新值与旧值（更新前的值），而 watchEffect 是拿不到的。
-3）watchEffect 在组件初始化的时候就会执行一次用以收集依赖（与computed同理），而后收集到的依赖发生变化，这个回调才会再次执行，而 watch 不需要，因为他一开始就指定了依赖。
+
+- 1）watchEffect 不需要指定监听的属性，他会自动的收集依赖，只要我们回调中引用到了"响应式的属性"， 那么当这些属性变更的时候，这个回调都会执行，而 watch 只能监听指定的属性而做出变更。
+
+- 2）watch 可以获取到新值与旧值（更新前的值），而 watchEffect 是拿不到的。
+
+- 3）watchEffect 在组件初始化的时候就会执行一次用以收集依赖（与computed同理），而后收集到的依赖发生变化，这个回调才会再次执行，而 watch 不需要，因为他一开始就指定了依赖。
 
 
-示例2，ctx上下文:
+[demo4](###)，ctx上下文,子组件：
 ```vue
 <template>
   <div>
@@ -239,20 +253,18 @@ export default {
 ```vue
 <template>
   <div>
-      <img alt="Vue logo" src="./assets/logo.png" />
-      <HelloWorld className="my-class" :msg="parentMsg" word="你好" @myClick="changeMsg" isShow>
+      <Child4 className="my-class" :msg="parentMsg" word="你好" @myClick="changeMsg" isShow>
         <div>我是slot外部第一行内容</div>
         <span>我是slot的第二行内容</span>
-      </HelloWorld>
+      </Child4>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import Child4 from './children/child4.vue'
 export default {
-  name: 'App',
   components: {
-    HelloWorld
+    Child4
   },
   data(){
     return{
@@ -272,6 +284,8 @@ export default {
 
 1)不声明props，则结果显示 props 是一个空对象，而 attrs 中包含了所有父组件传递的方法和属性
 
+[demo5](###)
+
 ```vue
 <template>
   <div>
@@ -288,9 +302,11 @@ export default {
 }
 </script>
 ```
-2）props 要先声明才能取值，attrs 不用先声明；props 声明过的属性，attrs 里不会再出现；props 中不可以声明方法，attrs 包含事件
+2）props 要先声明才能取值，attrs 不用先声明；props 声明过的属性，attrs 里不会再出现；props 中不可以声明方法，
+**attrs 包含事件**
 
-子组件：
+[demo6](###)
+
 ```vue
 <template>
   <div>
@@ -318,14 +334,19 @@ export default {
 综上所述：如果是props定义的，在子组件中一定要声明props，否则props无法获取，并且事件在 attrs 中！
 
 
-- 解释1；为什么props没有被包含在上下文中？
+> 解释1 为什么props没有被包含在上下文中？
+
 1.组件使用props的场景更多，有时甚至只需要使用props
+
 2.将props独立出来作为一个参数，可以让TypeScript对props单独做类型推导，不会和上下文中其他属性混淆。
 
-- 解释2:
+> 解释2
+
 this在setup中不可用，方法和生命周期都可以写在setup中，如果在方法中访问setup中的变量时，直接变量名就可以使用。
+
 方法名和变量名要在setup中return出去才可以正常执行。
 
+[demo7](###)
 ```vue
 <template>
   <div>
