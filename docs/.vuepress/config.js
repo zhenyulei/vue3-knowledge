@@ -31,7 +31,8 @@ module.exports = {
                         'cssinjs',
                         'forKey',
                         'slot',
-                        'model'
+                        'model',
+                        'scoped'
                     ]
                 },
                 'links'
