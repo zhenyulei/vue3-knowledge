@@ -1,12 +1,15 @@
 ## 9.针对scoped设置规则
 
 单文件组件 `<style scoped>`现在可以包含全局规则或只针对插槽内容的规则
+
 1、deep
 父组件覆盖子组件的样式
+
 2、slot
 设置父组件中slot的样式
+
 3、global
-设置 全局的样式
+设置全局的样式
 
 ```vue
 <style scoped>
@@ -27,25 +30,27 @@
 </style>
 ```
 父组件 App.vue
+
+[demo24](###)
 ```vue
 <template>
   <div>
-      <div class="text">父组件</div>
-      <HelloWorld><span class="my-slot">我是父组件的slot</span></HelloWorld>
+      <div class="text">父组件内容，子组件的全局样式生效</div>
+      <Child24><span class="my-slot">我是父组件的slot，子组件设置父组件中slot的样式</span></Child24>
   </div>
 </template>
 <script>
-import HelloWorld from './components/HelloWorld.vue';
+import Child24 from './children/child24.vue';
 export default {
   components: {
-    HelloWorld,
+    Child24,
   }
 }
 </script>
 
 <style scoped>
 /*覆盖子组件的样式*/
-:deep(.my-button){
+:deep(.my-child){
   color:red;
 }
 </style>
@@ -55,9 +60,9 @@ export default {
 ```vue
 <template>
 <div class="wraper">
-  <div class="text">hello</div>
+  <div class="text">子组件内容，全局样式生效</div>
   <slot>我是slot的替代内容</slot>
-  <button @click="changeColor" class="my-button">改变颜色</button>
+  <div class="my-child">子组件内容，父组件样式</div>
 </div>
 </template>
 
@@ -65,7 +70,7 @@ export default {
 :global(.text) {
   color:blueviolet;
 }
-.my-button{
+.my-child{
   color:green;
 }
 /*设置父组件中slot的样式*/

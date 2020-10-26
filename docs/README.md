@@ -4,11 +4,11 @@ heroImage: /favicon.ico
 actionText: 快速上手 →
 actionLink: /pages/
 features:
-- title: 简洁至上
-  details: 以 Markdown 为中心的项目结构，以最少的配置帮助你专注于写作。
-- title: Vue驱动
-  details: 享受 Vue + webpack 的开发体验，在 Markdown 中使用 Vue 组件，同时可以使用 Vue 来开发自定义主题。
+- title: 易用
+  details: 已经会了 HTML、CSS、JavaScript？即刻阅读指南开始构建应用！
+- title: 灵活
+  details: 不断繁荣的生态系统，可以在一个库和一套完整框架之间自如伸缩。
 - title: 高性能
-  details: VuePress 为每个页面预渲染生成静态的 HTML，同时在页面被加载的时候，将作为 SPA 运行。
+  details: 20kB min+gzip 运行大小，超快虚拟 DOM，最省心的优化
 footer: 编辑人：甄玉磊
 ---

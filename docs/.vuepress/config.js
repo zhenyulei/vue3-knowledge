@@ -32,7 +32,13 @@ module.exports = {
                         'forKey',
                         'slot',
                         'model',
-                        'scoped'
+                        'scoped',
+                        'teleport',
+                        'refs',
+                        'global',
+                        'directive',
+                        'render',
+                        'other'
                     ]
                 },
                 'links'
