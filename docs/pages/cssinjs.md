@@ -4,7 +4,7 @@
 ```vue
 <template>
 <div>
-  <div class="text">hello</div>
+  <div class="w-text">hello</div>
   <button @click="changeColor">改变颜色</button>
 </div>
 </template>
@@ -30,7 +30,7 @@ export default {
 </script>
 
 <style vars="{ myColor,fontSize }">
-.text {
+.w-text {
   color: var(--myColor);
   font-size:var(--fontSize)
 }
@@ -43,13 +43,12 @@ export default {
 ```vue
 <template>
 <div>
-  <div class="text">hello</div>
-  <button @click="changeColor">改变颜色</button>
+  <div class="w-text">hello</div>
 </div>
 </template>
 
 <style vars="{ currcolor }" scoped>
-.text {
+.w-text {
   color: var(--global:currcolor);
   font-size:20px;
 }
